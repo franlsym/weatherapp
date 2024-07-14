@@ -8,7 +8,7 @@ const WeatherApp = () => {
 
   useEffect(() => {
     if (isLoggedIn && location) {
-      fetch(`http://localhost:3000/weather?lat=${location.latitude}&lon=${location.longitude}`)
+      fetch(`http://localhost:4000/weather?lat=${location.latitude}&lon=${location.longitude}`)
         .then(response => response.json())
         .then(setWeather)
         .catch(err => setError(err.message));
@@ -17,7 +17,7 @@ const WeatherApp = () => {
 
   const handleLogin = async (username, password) => {
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('http://localhost:4000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
