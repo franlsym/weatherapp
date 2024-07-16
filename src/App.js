@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const WeatherApp = () => {
+export const WeatherApp = () => {
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
@@ -63,7 +63,7 @@ const WeatherApp = () => {
   );
 };
 
-const LoginForm = ({ onLogin, error }) => {
+export const LoginForm = ({ onLogin, error }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
