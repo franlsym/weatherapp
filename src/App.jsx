@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { CompassNavigator } from "./Compass";
+import { WeatherServiceApi } from "./WeatherService";
+import { AuthServiceApi } from "./AuthService";
 
-export const WeatherApp = () => {
+export const WeatherApp = ({
+  compass = new CompassNavigator(),
+  weatherService = new WeatherServiceApi(),
+  authService = new AuthServiceApi(),
+} = {}) => {
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
@@ -8,38 +15,20 @@ export const WeatherApp = () => {
 
   useEffect(() => {
     if (isLoggedIn && location) {
-      fetch(`http://localhost:4000/weather?lat=${location.latitude}&lon=${location.longitude}`)
-        .then(response => response.json())
+      weatherService
+        .getWeather(location)
         .then(setWeather)
-        .catch(err => setError(err.message));
+        .catch((err) => setError(err.message));
     }
   }, [location, isLoggedIn]);
 
   const handleLogin = async (username, password) => {
-    try {
-      const response = await fetch('http://localhost:4000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        setIsLoggedIn(true);
-        navigator.geolocation.getCurrentPosition(
-          (position) => setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          }),
-          (err) => setError(err.message)
-        );
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError('Login failed');
-    }
+    authService
+      .login(username, password)
+      .then(() => setIsLoggedIn(true))
+      .then(() => compass.getCurrentPosition())
+      .then(setLocation)
+      .catch((err) => setError(err.message));
   };
 
   if (!isLoggedIn) {
@@ -64,8 +53,8 @@ export const WeatherApp = () => {
 };
 
 export const LoginForm = ({ onLogin, error }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -74,7 +63,7 @@ export const LoginForm = ({ onLogin, error }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <input
         type="text"
         value={username}
